@@ -1,0 +1,73 @@
+
+
+START TRANSACTION;
+
+UPDATE account
+SET balance = balance - 2000
+WHERE id = 1;
+
+UPDATE account
+SET balance = balance + 3000
+WHERE id = 2;
+
+UPDATE account
+SET balance = balance - 1000
+WHERE id = 1;
+
+ROLLBACK;
+
+sab undo ho jayega koi chage nhi hoga 
+----------------------------------------------
+
+START TRANSACTION;
+
+UPDATE account
+SET balance = balance - 2000
+WHERE id = 1;
+
+SAVEPOINT S1;
+
+UPDATE account
+SET balance = balance + 3000
+WHERE id = 2;
+
+UPDATE account
+SET balance = balance - 1000
+WHERE id = 1;
+
+ROLLBACK TO S1;
+
+COMMIT;
+
+//a=8000
+//b=5000
+ s1 ke baad wla undo hoga 
+
+-------------------------------------------
+
+2)=>
+
+START TRANSACTION;
+
+UPDATE account
+SET balance = balance - 3000
+WHERE id = 1;
+
+SAVEPOINT S1;
+
+UPDATE account
+SET balance = balance + 2000
+WHERE id = 2;
+
+SAVEPOINT S2;
+
+UPDATE account
+SET balance = balance - 1000
+WHERE id = 1;
+
+ROLLBACK TO S2;
+
+COMMIT;
+
+
+s2 ke bad wala undo hoga 
