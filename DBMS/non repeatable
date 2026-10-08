@@ -1,0 +1,138 @@
+-- 
+-- NON-REPEATABLE READ
+
+-- 1. Create table
+CREATE TABLE account (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    balance INT
+);
+
+-- 2. Insert accounts
+INSERT INTO account VALUES
+(1, 'A', 20000),
+(2, 'B', 10000);
+
+
+START TRANSACTION;
+
+-- A ka first READ
+SELECT balance
+FROM account
+WHERE id = 1;
+
+-- Output:
+-- 20000
+
+
+-- T2 = Bank ka Transaction
+
+START TRANSACTION;
+
+-- A se ₹5000 debit
+UPDATE account
+SET balance = balance - 5000
+WHERE id = 1;
+
+COMMIT;
+
+-- Ab A = 15000
+
+
+-- T1 = A ko dobara READ
+
+SELECT balance
+FROM account
+WHERE id = 1;
+
+-- Output:
+-- 15000
+
+
+-- T2 = B mein ₹5000 add
+
+START TRANSACTION;
+
+UPDATE account
+SET balance = balance + 5000
+WHERE id = 2;
+
+COMMIT;
+
+-- Ab B = 15000
+
+
+-- 
+-- T1 = B ka first READ
+
+SELECT balance
+FROM account
+WHERE id = 2;
+
+-- Output:
+-- 15000
+
+
+-- T3 = B se ₹3000 debit
+
+START TRANSACTION;
+
+UPDATE account
+SET balance = balance - 3000
+WHERE id = 2;
+
+COMMIT;
+
+-- Ab B = 12000
+
+
+-- T1 = B ko dobara READ
+
+SELECT balance
+FROM account
+WHERE id = 2;
+
+-- Output:
+-- 12000
+
+
+-- T1 complete
+COMMIT;
+
+-----------------------------------------------
+
+
+CREATE TABLE products (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    price INT,
+    stock INT
+);
+
+INSERT INTO products VALUES
+(1, 'Laptop', 50000, 10);
+
+START TRANSACTION;
+
+SELECT price, stock
+FROM products
+WHERE id = 1;
+
+-- Output: 50000, 10
+
+START TRANSACTION;
+
+UPDATE products
+SET price = 45000,
+    stock = 8
+WHERE id = 1;
+
+COMMIT;
+
+SELECT price, stock
+FROM products
+WHERE id = 1;
+
+-- Output: 45000, 8
+
+COMMIT;
